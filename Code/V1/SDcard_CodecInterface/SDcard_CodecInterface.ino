@@ -1,10 +1,15 @@
-#include <FS.h>
 #include <SD.h>
+#include <driver/i2s.h>
 #include <SPI.h>
-#include <ezButton.h>
+#include <SSD1306.h>
 
-int sd1 = 13;
-int mode = 14;
+#define sd1      5
+#define sd2      4
+#define I2S_DOUT 25
+#define I2S_BCLK 27
+#define I2S_LRC  26
+#define I2s_NUM  0
+
 int play = 27;
 
 int s1En = 5;
@@ -38,7 +43,7 @@ void loop()
 
 }
 
-int initcard(int card1, int card2)
+void initcard(int card1, int card2)
 {
   int crd1 = card1;
   int crd2 = card2;
