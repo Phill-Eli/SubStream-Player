@@ -35,9 +35,6 @@
 #define Back_Bttn
 #define play_bttn
 
-// Initialize the OLED display using Arduino Wire:
-SSD1306Wire display(0x3c, SDA, SCL);   // ADDRESS, SDA, SCL  -  SDA and SCL usually populate automatically based on your board's pins_arduino.h e.g. https://github.com/esp8266/Arduino/blob/master/variants/nodemcu/pins_arduino.h
-
  // Create Audio object
 Audio audio;
  
@@ -70,27 +67,12 @@ void setup() {
     
     // Open music file
     audio.connecttoFS(SD,"/wavfile.wav");
-
-    display.init();
-
-    display.flipScreenVertically();
-    display.setFont(ArialMT_Plain_10);
     
 }
-
-void drawFontFaceDemo() {
-  // Font Demo1
-  // create more fonts at http://oleddisplay.squix.ch/
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.setFont(ArialMT_Plain_10);
-  display.drawString(0, 0, "Hello world");
 
 }
 
 void loop()
 {
-  display.clear();
-  drawFontFaceDemo();
-  display.display();
   audio.loop();    
 }
