@@ -21,7 +21,6 @@
 // ==> Example to use built in DAC of ESP32
 
 #include "BluetoothA2DPSink.h"
-#include "Audio.h"
 
 //        I2S
           #define I2S_DOUT      25          // i2S Data out oin
@@ -96,7 +95,7 @@ void audioControl()
   int volDown = digitalRead(vol_minus);
   int play = digitalRead(play_bttn);
   int skip = digitalRead(skip_bttn);
-  a2dp_sink.
+
     
   if (volUp == 0)
   {
