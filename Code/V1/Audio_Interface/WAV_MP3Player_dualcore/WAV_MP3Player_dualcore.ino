@@ -81,8 +81,6 @@ void setup() {
   // Open music file
   audio.connecttoFS(SD, "/wavfile.wav");
 
-  audioControl();
-
   display.init();
 
   display.flipScreenVertically();
@@ -108,14 +106,6 @@ void setup() {
     &Task2,    /* Task handle to keep track of created task */
     1);        /* pin task to core 1 */
 
-  xTaskCreatePinnedToCore(
-    Task2code, /* Task function. */
-    "Task3",   /* name of task. */
-    10000,     /* Stack size of task */
-    NULL,      /* parameter of the task */
-    0,         /* priority of the task */
-    &Task2,    /* Task handle to keep track of created task */
-    1);        /* pin task to core 1 */
 }
 
 
@@ -143,15 +133,6 @@ void Task2code(void* pvParameters) {
   }
 }
 
-void Task3code(void* pvParameters) {
-  Serial.print("Task3 running on core ");
-  Serial.println(xPortGetCoreID());
-
-  for (;;) {
-    audioControl();
-  }
-}
-
 
 void drawFontFace() {
   // Font Demo1
@@ -172,34 +153,6 @@ void drawProgressBar() {
   counter++;
 }
 
-void audioControl()
-{
-  int volUp = digitalRead(vol_plus);
-    int volDown = digitalRead(vol_minus);
-    int play = digitalRead(play_bttn);
-    int skip = digitalRead(skip_bttn);
-    
-    audio.setVolumeSteps(15);
-    if (volUp == 0)
-    {
-        volume += 15;
-        audio.setVolume(volume);
-    }
-    if (volDown == 0)
-    {
-        volume -= 15;
-        audio.setVolume(volume);
-    }
-    if (play == 0)
-    {
-        audio.pauseResume();
-    } 
-    if (skip == 0)
-    {
-        audio.pauseResume();
-    }
-
-}
 
 void loop() {
 
