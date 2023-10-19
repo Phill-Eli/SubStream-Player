@@ -86,7 +86,7 @@ void setup() {
   }
   // Setup I2S
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-  audio.setBufsize(int rambuf_sz, int psrambuf_sz)
+  //audio.setBufsize(int rambuf_sz, int psrambuf_sz)
   // Set Volume
   audio.setVolume(20);
 
@@ -153,7 +153,7 @@ void Task2code(void* pvParameters) {
     img.drawString(String(x),20,74,7); 
 
     img.pushSprite(0,0);
-    //delay(1000);
+    delay(1000);
   
   }
 }

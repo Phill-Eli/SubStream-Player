@@ -64,6 +64,8 @@ void setup() {
     
     // Set Volume
     audio.setVolume(75);
+
+    //audio.connecttoSD("/wavfile.wav");
     
     // Open music file
     audio.connecttoFS(SD,"/wavfile.wav");
