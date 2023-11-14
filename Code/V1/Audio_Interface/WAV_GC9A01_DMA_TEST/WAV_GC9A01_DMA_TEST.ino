@@ -135,7 +135,7 @@ void Task1code(void* pvParameters) {
 
   for (;;) {
 
-    audio.loop();
+    //audio.loop();
   }
 }
 
@@ -155,6 +155,8 @@ void Task2code(void* pvParameters) {
 
     img.pushSprite(0,0);
     delay(1000);
+
+
 
   }
 }
