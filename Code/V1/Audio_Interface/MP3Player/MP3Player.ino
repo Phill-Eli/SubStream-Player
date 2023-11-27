@@ -68,7 +68,7 @@ void setup() {
     //audio.connecttoSD("/wavfile.wav");
     
     // Open music file
-    audio.connecttoFS(SD,"/wavfile.wav");
+    audio.connecttoFS(SD,"/Album_1/wavfile.wav");
     
 }
 
