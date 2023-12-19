@@ -315,12 +315,12 @@ void fileType(String file)
     Serial.println("File is Jpeg");
     image.concat(Name);
   } 
-  else if (audioName.indexOf(mp3) != -1)
+  else if (Name.indexOf(mp3) != -1)
   {
     Serial.println("File is mp3");
     audio.concat(Name);
   }
-  else if (audioName.indexOf(wav) != -1)
+  else if (Name.indexOf(wav) != -1)
   {
     Serial.println("File is wav");
     audio.concat(Name);
