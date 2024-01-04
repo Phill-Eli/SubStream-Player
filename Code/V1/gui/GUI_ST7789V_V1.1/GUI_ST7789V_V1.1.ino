@@ -1,5 +1,4 @@
 #include <SD.h>
-#include <TFT_eSPI.h>
 //#include "buttons.h"
 #include <OneButton.h>
 #include <TJpg_Decoder.h>
@@ -10,7 +9,11 @@
   #include "SPIFFS.h" // ESP32 only
 #endif
 
-TFT_eSPI tft = TFT_eSPI();
+#include "SPI.h"
+#include <TFT_eSPI.h>              // Hardware-specific library
+TFT_eSPI tft = TFT_eSPI();         // Invoke custom library
+
+#define USE_DMA_TO_TFT
 
 #define upButtonPin 16   // External up button
 #define downButtonPin 33  // External down button
@@ -32,10 +35,13 @@ String image = "/";
 
 int currentIndex = 0;
 
-bool isAlbums = true;
-bool isTracks = false;
-bool isSettings = false;
-bool isPlaying = false;
+//page number tracker variable to change function of buttons on each page as needed
+int pageNum = 1;
+
+//settings: 0
+//albums: 1
+//tracks: 2
+//song: 3
 
 // This next function will be called during decoding of the jpeg file to
 // render each block to the TFT.  If you use a different TFT library
@@ -90,11 +96,6 @@ void openCard()
     currentIndex = 0;
   }
   */
-
-  bool isAlbums = true;
-  bool isTracks = false;
-  bool isSettings = false;
-  bool isPlaying = false;
   
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
   delay(50);
@@ -134,10 +135,6 @@ void openAlbum()
     currentDisplayIndex++;
   }
 
-  isAlbums = false;
-  isTracks = true;
-  isSettings = false;
-  isPlaying = false;
 
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
   delay(50);
@@ -145,7 +142,7 @@ void openAlbum()
 
 void up()
 {
-  if (isAlbums)
+  if (pageNum == 1)
   {
     if(currentIndex > 0)
     {
@@ -155,7 +152,7 @@ void up()
     }
 
   }
-  else if (isTracks)
+  else if (pageNum == 2)
   {
     if(currentIndex > 0)
     {
@@ -165,11 +162,11 @@ void up()
     }
 
   }
-    else if (isSettings)
+    else if (pageNum == 0)
     {
 
     }
-    else if (isPlaying)
+    else if (pageNum == 3)
     {
 
     }
@@ -179,7 +176,7 @@ void up()
 
 void down()
 { 
-    if (isAlbums)
+    if (pageNum == 1)
   {
     if(currentIndex < 10)
     {
@@ -189,7 +186,7 @@ void down()
     }
 
   }
-  else if (isTracks)
+  else if (pageNum == 2)
   {
     if(currentIndex < 10)
     {
@@ -199,11 +196,11 @@ void down()
     }
 
   }
-    else if (isSettings)
+    else if (pageNum == 0)
     {
 
     }
-    else if (isPlaying)
+    else if (pageNum == 3)
     {
 
     }
@@ -212,22 +209,30 @@ void down()
 
 void select()
 {
-  if (isSettings)
+  if (pageNum == 0)
   {
 
   }
-  else if (isAlbums)
+  else if (pageNum == 1)
   {
     Serial.print(folders[currentIndex].c_str()); Serial.println(" has been selected");
-    openAlbum();
+    openCard();
+
+    pageNum = 2;
 
   }
-  else if (isTracks)
+  else if (pageNum == 2)
   {
     Serial.print(album[currentIndex].c_str()); Serial.println(" has been selected");
-    //openAlbum();
-    display();
+    openAlbum();
 
+    pageNum = 3;
+    //display();
+
+  }
+  else if (pageNum == 3)
+  {
+    display();
   }
   
 }
@@ -235,35 +240,26 @@ void select()
 void selectBack()
 {
 
-  if (isAlbums)
+  if (pageNum == 1)
   {
     Serial.println("Back to Albums");
     //penCard();
-    
-    isAlbums = true;
-    isTracks = false;
-    isPlaying = false;
-    isSettings = false;
+
   }
-  else if (isTracks)
+  else if (pageNum == 2)
   {
     Serial.println("Back to Albums");
     openCard();
-    
-    isAlbums = true;
-    isTracks = false;
-    isPlaying = false;
-    isSettings = false;
+
+    pageNum = 1;
+
   }
-  else if (isPlaying)
+  else if (pageNum == 3)
   {
     Serial.println("Back to Tracks");
     openAlbum();
 
-    isAlbums = false;
-    isTracks = true;
-    isPlaying = false;
-    isSettings = false;
+    pageNum = 2;
   }
 }
 
@@ -314,6 +310,7 @@ void fileType(String file)
   {
     Serial.println("File is Jpeg");
     image.concat(Name);
+    Serial.println(image);
   } 
   else if (Name.indexOf(mp3) != -1)
   {
@@ -329,12 +326,17 @@ void fileType(String file)
   {
     Serial.println("File is not of mentioned type");
   }
+
 }
 
 void display()
 {
   uint32_t t = millis();
+
+  tft.fillScreen(TFT_DARKGREY);
   
+  fileType(album[currentIndex].c_str());
+
   // Get the width and height in pixels of the jpeg if you wish
   uint16_t w = 0, h = 0;
   TJpgDec.getSdJpgSize(&w, &h,  image);
@@ -344,12 +346,14 @@ void display()
   
   TJpgDec.drawSdJpg(30,20, image);
   //tft.loadFont(AA_FONT_LARGE);
-  tft.drawString(audio, 25, 217, 10);
+  //tft.drawString(audio, 25, 217, 10);
 
   // How much time did rendering take
   t = millis() - t;
   Serial.print(t); Serial.println(" ms");
 
+  image = "/";
+  audio = "/";
 }
 
 void setup() 
@@ -362,6 +366,13 @@ void setup()
     while (1) delay(0);
   }
   Serial.println("\r\nSD Card Initialized.");
+
+  #ifdef USE_DMA_TO_TFT
+  // DMA - should work with ESP32, STM32F2xx/F4xx/F7xx processors
+  // NOTE: >>>>>> DMA IS FOR SPI DISPLAYS ONLY <<<<<<
+  tft.initDMA(); // Initialise the DMA engine (tested with STM32F446 and STM32F767)
+  #endif
+
 
   tft.begin();
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
